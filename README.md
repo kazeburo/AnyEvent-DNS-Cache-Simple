@@ -30,8 +30,8 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
 AnyEvent::DNS::Cache::Simple provides simple cache capability for AnyEvent::DNS
 
 CPAN already has AnyEvent::CacheDNS module. It also provides simple cache. 
-AnyEvent::DNS::Cache::Simple support ttl, negative\_ttl, dns-rr and changing any cache module.
-And AnyEvent::DNS::Cache::Simple does not use AnyEvent->timer for purging cache.
+AnyEvent::DNS::Cache::Simple support ttl, negative\_ttl, dns-rr and can use with 
+any cache module. And AnyEvent::DNS::Cache::Simple does not use AnyEvent->timer for purging cache.
 
 # METHOD
 
