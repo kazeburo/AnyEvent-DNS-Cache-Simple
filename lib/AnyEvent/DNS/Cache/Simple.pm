@@ -72,6 +72,7 @@ sub register {
             adcs_negative_ttl => $negative_ttl,
             adcs_cache => $cache,
             adcs_rr => {},
+            %args
         );
         $ENV{PERL_ANYEVENT_RESOLV_CONF} 
             ? $resolver->_load_resolv_conf_file ($ENV{PERL_ANYEVENT_RESOLV_CONF})
@@ -98,7 +99,8 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
 
     my $guard = AnyEvent::DNS::Cache::Simple->register(
         ttl => 60,
-        negative_ttl => 5
+        negative_ttl => 5,
+        timeout => 5
     );
     
     for my $i ( 1..3 ) {
@@ -126,6 +128,8 @@ And AnyEvent::DNS::Cache::Simple don't use AnyEvent->timer for purging cache.
 
 Register cache to <$AnyEvent::DNS::RESOLVER>. This method returns guard object.
 If the guard object is destroyed, original resolver will be restored
+
+register can accept all AnyEvent::DNS->new arguments and has some addtional arguments.
 
 =over 4
 
