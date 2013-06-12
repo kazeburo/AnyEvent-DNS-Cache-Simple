@@ -74,7 +74,7 @@ sub register {
             adcs_rr => {},
             %args
         );
-        if ( @{$resolver->{server}} == 0 ) {
+        if ( !$args{server} ) {
             $ENV{PERL_ANYEVENT_RESOLV_CONF} 
                 ? $resolver->_load_resolv_conf_file ($ENV{PERL_ANYEVENT_RESOLV_CONF})
                 : $resolver->os_config;
