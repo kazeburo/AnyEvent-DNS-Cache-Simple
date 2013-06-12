@@ -74,9 +74,11 @@ sub register {
             adcs_rr => {},
             %args
         );
-        $ENV{PERL_ANYEVENT_RESOLV_CONF} 
-            ? $resolver->_load_resolv_conf_file ($ENV{PERL_ANYEVENT_RESOLV_CONF})
-            : $resolver->os_config;
+        if ( @{$resolver->{server}} == 0 ) {
+            $ENV{PERL_ANYEVENT_RESOLV_CONF} 
+                ? $resolver->_load_resolv_conf_file ($ENV{PERL_ANYEVENT_RESOLV_CONF})
+                : $resolver->os_config;
+        }
         $resolver;
     };
     AnyEvent::Util::guard {
@@ -106,7 +108,7 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
     for my $i ( 1..3 ) {
         my $cv = AE::cv;
         AnyEvent::DNS::a "example.com", sub {
-            warn join " | ",@_;
+            say join " | ",@_;
             $cv->send;
         };
         $cv->recv;
