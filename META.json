@@ -42,6 +42,8 @@
       },
       "runtime" : {
          "requires" : {
+            "AnyEvent" : "7.04",
+            "Cache::Memory::Simple" : "1.01",
             "perl" : "5.008005"
          }
       },
@@ -52,5 +54,16 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/AnyEvent-DNS-Cache-Simple/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/AnyEvent-DNS-Cache-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kazeburo/AnyEvent-DNS-Cache-Simple.git",
+         "web" : "https://github.com/kazeburo/AnyEvent-DNS-Cache-Simple"
+      }
+   },
    "version" : "0.01"
 }

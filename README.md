@@ -8,14 +8,15 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
 
     my $guard = AnyEvent::DNS::Cache::Simple->register(
         ttl => 60,
-        negative_ttl => 5
+        negative_ttl => 5,
+        timeout => 5
     );
     
 
     for my $i ( 1..3 ) {
         my $cv = AE::cv;
         AnyEvent::DNS::a "example.com", sub {
-            warn join " | ",@_;
+            say join " | ",@_;
             $cv->send;
         };
         $cv->recv;
@@ -38,6 +39,8 @@ And AnyEvent::DNS::Cache::Simple don't use AnyEvent->timer for purging cache.
 
 Register cache to <$AnyEvent::DNS::RESOLVER>. This method returns guard object.
 If the guard object is destroyed, original resolver will be restored
+
+register can accept all AnyEvent::DNS->new arguments and has some additional arguments.
 
 - ttl: Int
 
