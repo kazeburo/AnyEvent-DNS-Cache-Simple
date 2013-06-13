@@ -5,54 +5,43 @@ use strict;
 use warnings;
 use base qw/AnyEvent::DNS/;
 use Cache::Memory::Simple;
-use Data::Dumper;
+use List::Util qw(min);
 
 our $VERSION = "0.01";
 
-sub serialize_opt {
-    my $value = shift;
-    if ( defined $value && ref($value) ) {
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 0; 
-        local $Data::Dumper::Sortkeys = 1; 
-        $value = Data::Dumper::Dumper($value);
+sub request($$) {
+   my ($self, $req, $cb) = @_;
+   my ($name, $qtype, $class) = @{$req->{qd}[0]};
+   my $cache_key = "$class $qtype $name"; #compatibility with Net::DNS::Lite
+   if ( my $cached = $self->{adcs_cache}->get($cache_key) ) {
+        my ($res,$expires_at) = @$cached;
+        if ( $expires_at < Time::HiRes::time ) {
+            undef $res;
+            $self->{adcs_cache}->delete($cache_key)
+        }
+        if ( !defined $res ) {
+            $cb->();
+            return;
+        }
+        return $cb->($res);
     }
-    $value;
-}
 
-sub resolve {
-    my $cb = pop @_;
-    my ($self, $qname, $qtype, %opt) = @_;
-    my $cache_key = $qtype .':'. $qname . ':' . serialize_opt(\%opt);
-    if ( my $cached = $self->{adcs_cache}->get($cache_key) ) {
-        if ( @$cached == 0 ) {
-            $cb->();
-            return;
-        }
-        my @cached = @$cached; #copy
-        if ( exists $self->{adcs_rr}{$cache_key} ) {
-            $self->{adcs_rr}{$cache_key}++;
-            $self->{adcs_rr}{$cache_key} = 0 if $self->{adcs_rr}{$cache_key} >= scalar @cached;
-        } else {
-            $self->{adcs_rr}{$cache_key} = 0;
-        }
-        my @spliced = splice @cached, 0, $self->{adcs_rr}{$cache_key};
-        push @cached, @spliced;
-        $cb->(@cached);
-        return;
-    }
-    
     # request
-    $self->SUPER::resolve($qname, $qtype, %opt, sub {
+    $self->SUPER::request($req, sub {
+        my ($res) = @_;
         if ( !@_ ) {
-            $self->{adcs_cache}->set($cache_key, [], $self->{adcs_negative_ttl});
-            $cb->();
-            return;
+            $self->{adcs_cache}->set($cache_key, [undef, $self->{adcs_negative_ttl} + Time::HiRes::time() ], $self->{adcs_negative_ttl});
+            return $cb->();
         }
-        $self->{adcs_cache}->set($cache_key, \@_, $self->{adcs_ttl});
-        $self->{adcs_rr}{$cache_key} = 0;
-        $cb->(@_);
-    });
+        my $ttl = min(
+            $self->{adcs_ttl},
+            map {
+                $_->[3]
+            } (@{$res->{an}} ? @{$res->{an}} : @{$res->{ns}}),
+        );
+        $self->{adcs_cache}->set($cache_key, [$res, $ttl + Time::HiRes::time ], $ttl);
+        $cb->($res);
+    });        
 }
 
 sub register {
@@ -71,7 +60,6 @@ sub register {
             adcs_ttl => $ttl,
             adcs_negative_ttl => $negative_ttl,
             adcs_cache => $cache,
-            adcs_rr => {},
             %args
         );
         if ( !$args{server} ) {
@@ -121,8 +109,8 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
 AnyEvent::DNS::Cache::Simple provides simple cache capability for AnyEvent::DNS
 
 CPAN already has AnyEvent::CacheDNS module. It also provides simple cache. 
-AnyEvent::DNS::Cache::Simple support ttl, negative_ttl, dns-rr and can use with 
-any cache module. And AnyEvent::DNS::Cache::Simple does not use AnyEvent->timer for purging cache.
+AnyEvent::DNS::Cache::Simple support ttl, negative_ttl and can use with any cache module.
+And AnyEvent::DNS::Cache::Simple does not use AnyEvent->timer for purging cache.
 
 =head1 METHOD
 
@@ -137,7 +125,7 @@ register can accept all AnyEvent::DNS->new arguments and has some additional arg
 
 =item ttl: Int
 
-positive cache ttl in seconds. (default: 5)
+maximum positive cache ttl in seconds. (default: 5)
 
 =item negative_ttl: Int
 
@@ -145,7 +133,7 @@ negative cache ttl in seconds. (default: 1)
 
 =item cache: Object
 
-Cache object, requires support get and set methods.
+Cache object, requires support get, set and remove methods.
 default: Cache::Memory::Simple is used
 
 =back

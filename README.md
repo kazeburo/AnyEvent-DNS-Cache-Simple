@@ -30,8 +30,8 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
 AnyEvent::DNS::Cache::Simple provides simple cache capability for AnyEvent::DNS
 
 CPAN already has AnyEvent::CacheDNS module. It also provides simple cache. 
-AnyEvent::DNS::Cache::Simple support ttl, negative\_ttl, dns-rr and can use with 
-any cache module. And AnyEvent::DNS::Cache::Simple does not use AnyEvent->timer for purging cache.
+AnyEvent::DNS::Cache::Simple support ttl, negative\_ttl and can use with any cache module.
+And AnyEvent::DNS::Cache::Simple does not use AnyEvent->timer for purging cache.
 
 # METHOD
 
@@ -44,7 +44,7 @@ register can accept all AnyEvent::DNS->new arguments and has some additional arg
 
 - ttl: Int
 
-    positive cache ttl in seconds. (default: 5)
+    maximum positive cache ttl in seconds. (default: 5)
 
 - negative\_ttl: Int
 
@@ -52,7 +52,7 @@ register can accept all AnyEvent::DNS->new arguments and has some additional arg
 
 - cache: Object
 
-    Cache object, requires support get and set methods.
+    Cache object, requires support get, set and remove methods.
     default: Cache::Memory::Simple is used
 
 # SEE ALSO

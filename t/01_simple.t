@@ -17,13 +17,13 @@ my $guard = AnyEvent::DNS::Cache::Simple->register(
 
 for my $i ( 1..3 ) {
     my $cv = AE::cv;
-    ok(!$cache->get('a:google.com:{}')) if $i == 1;
+    ok(!$cache->get('in a google.com')) if $i == 1;
     AnyEvent::DNS::a "google.com", sub {
         ok(scalar @_);
         $cv->send;
     };
     $cv->recv;
-    ok($cache->get('a:google.com:{}'));
+    ok($cache->get('in a google.com'),"positive cache check $i");
 }
 
 undef $guard;
@@ -35,7 +35,7 @@ for my $i ( 1..3 ) {
         $cv->send;
     };
     $cv->recv;
-    ok(!$cache->get('a:example.com:{}'));    
+    ok(!$cache->get('in a example.com'),"negative cache check $i");
 }
 
 done_testing();
