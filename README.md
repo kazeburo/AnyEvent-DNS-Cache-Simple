@@ -9,7 +9,7 @@ AnyEvent::DNS::Cache::Simple - Simple cache for AnyEvent::DNS
     my $guard = AnyEvent::DNS::Cache::Simple->register(
         ttl => 60,
         negative_ttl => 5,
-        timeout => 5
+        timeout => [1,1]
     );
     
 
