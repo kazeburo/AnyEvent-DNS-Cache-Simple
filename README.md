@@ -37,10 +37,10 @@ And AnyEvent::DNS::Cache::Simple does not use AnyEvent->timer for purging cache.
 
 ## register
 
-Register cache to <$AnyEvent::DNS::RESOLVER>. This method returns guard object.
+Register cache to `$AnyEvent::DNS::RESOLVER`. This method returns guard object.
 If the guard object is destroyed, original resolver will be restored
 
-register can accept all AnyEvent::DNS->new arguments and has some additional arguments.
+register can accept all `AnyEvent::DNS-`new> arguments and has some additional arguments.
 
 - ttl: Int
 
