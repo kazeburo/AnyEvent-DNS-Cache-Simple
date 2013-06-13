@@ -5,7 +5,8 @@ use strict;
 use warnings;
 use base qw/AnyEvent::DNS/;
 use Cache::Memory::Simple;
-use List::Util qw(min);
+use List::Util qw//;
+use Time::HiRes qw//;
 
 our $VERSION = "0.01";
 
@@ -17,7 +18,7 @@ sub request($$) {
         my ($res,$expires_at) = @$cached;
         if ( $expires_at < Time::HiRes::time ) {
             undef $res;
-            $self->{adcs_cache}->delete($cache_key)
+            $self->{adcs_cache}->remove($cache_key)
         }
         if ( !defined $res ) {
             $cb->();
@@ -33,7 +34,7 @@ sub request($$) {
             $self->{adcs_cache}->set($cache_key, [undef, $self->{adcs_negative_ttl} + Time::HiRes::time() ], $self->{adcs_negative_ttl});
             return $cb->();
         }
-        my $ttl = min(
+        my $ttl = List::Util::min(
             $self->{adcs_ttl},
             map {
                 $_->[3]

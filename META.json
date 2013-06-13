@@ -43,7 +43,9 @@
       "runtime" : {
          "requires" : {
             "AnyEvent" : "7.04",
-            "Cache::Memory::Simple" : "1.01",
+            "Cache::Memory::Simple" : "1.02",
+            "List::Util" : "0",
+            "Time::HiRes" : "0",
             "perl" : "5.008005"
          }
       },
