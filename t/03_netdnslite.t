@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use t::TestCache;
+require "./t/TestCache.pm";
+t::TestCache->import();
 use AnyEvent::DNS::Cache::Simple;
 use Test::More;
 use Test::Requires qw/Net::DNS::Lite/;
